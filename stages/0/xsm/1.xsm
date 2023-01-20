@@ -1,0 +1,38 @@
+0
+2056
+0
+0
+0
+0
+0
+0
+MOV R0,1
+MOV R1,2
+MOV R2,3
+PUSH R0
+GT R0,R1
+JNZ R0,_c02
+_c12:
+PUSH R1
+GT R1,R2
+JNZ R1,_c1
+MOV R3,R2
+JMP _ret
+_c1:
+POP R1
+MOV R3,R1
+JMP _ret
+_c02:
+POP R0
+PUSH R0
+GT R0,R2
+JNZ R0,_c0
+MOV R3,R1
+JMP _ret
+_c0:
+POP R0
+MOV R3,R0
+
+
+_ret:
+HALT
