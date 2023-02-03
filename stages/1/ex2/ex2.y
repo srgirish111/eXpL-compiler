@@ -12,7 +12,7 @@
 	 struct tnode *no;
 	}
 %token NUM PLUS MINUS MUL DIV END
-%type <no> expr NUM program END	
+%type <no> expr NUM program END
 
 %left PLUS MINUS
 %left MUL DIV	

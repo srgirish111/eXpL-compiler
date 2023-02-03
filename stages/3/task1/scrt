@@ -1,0 +1,3 @@
+lex *.l
+yacc -d *.y
+gcc lex.yy.c y.tab.c -o out.exe
