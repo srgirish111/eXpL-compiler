@@ -665,7 +665,7 @@ YY_DECL
 		}
 
 	{
-#line 10 "ex2.l"
+#line 9 "ex2.l"
 
 
 #line 672 "lex.yy.c"
@@ -727,17 +727,17 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 12 "ex2.l"
+#line 11 "ex2.l"
 {++i;}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 13 "ex2.l"
+#line 12 "ex2.l"
 {++f;}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 14 "ex2.l"
+#line 13 "ex2.l"
 ECHO;
 	YY_BREAK
 #line 744 "lex.yy.c"
@@ -1745,7 +1745,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 14 "ex2.l"
+#line 13 "ex2.l"
 
 
 int main() 

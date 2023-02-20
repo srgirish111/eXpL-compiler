@@ -5,7 +5,6 @@ int i=0,f=0;
 
 
 number [0-9]
-point "."
 %option noyywrap
 %%
 

@@ -12,50 +12,54 @@
 	FILE *fp;
 	extern FILE *yyin;
 %}
+
 %union
 {
 	struct tnode *no;
 }
-%type <no> NUM ID expr Stmt Slist program Ifstmt Whilestmt E
 %token NUM ID PLUS MINUS MUL DIV READ WRITE PBEGIN PEND IF THEN ELSE ENDIF GT LT GE LE EQ NE WHILE DO ENDWHILE
+%type <no> NUM ID expr Stmt Slist program Ifstmt Whilestmt E
+%left GE LE EQ NE GT LT
 %left PLUS MINUS
 %left MUL DIV
 
 %%
 program : PBEGIN Slist PEND';'	{$$=$2;
 				 printf("Abstract syntax tree created succesfully\n");
-				 inorder($$);
-				 headergen();
-				 i = codegen($$);
-				 i = sys_call("Exit",0,0);
-                 printf("xsm file generated");
+				 preorder($$);
+				 i=evaluate($$);
+                 //printf("xsm file generated");
                 }
 	|PBEGIN PEND';'		{$$=NULL;}
 	;
-Slist	: Slist Stmt		{$$=create_tree(0,0,NULL,conn_node,$1,$2);}	
+Slist	: Slist Stmt		{$$=create_tree(0,0,NULL,conn_node,$1,$2,NULL);}	
 	|Stmt			{$$=$1;}
 	;
-Stmt	: READ'('ID')'';'	{$$=create_tree(0,0,NULL,read_node,$3,NULL);}
-	|WRITE'('expr')'';'	{$$=create_tree(0,0,NULL,write_node,$3,NULL);}
-	|ID'='expr';'	{$$=create_tree(0,0,"=",assg_node,$1,$3);}
+Stmt	: READ'('ID')'';'	{$$=create_tree(0,0,NULL,read_node,$3,NULL,NULL);}
+	|WRITE'('expr')'';'	{$$=create_tree(0,0,NULL,write_node,$3,NULL,NULL);}
+	|ID'='expr';'	{$$=create_tree(0,0,"=",assg_node,$1,$3,NULL);}
 	|Ifstmt
 	|Whilestmt
 	;
 
-Ifstmt : IF '('E')' THEN Slist ELSE Slist ENDIF
-        | IF '('E')' THEN Slist ENDIF
+Ifstmt : IF '('E')' THEN Slist ELSE Slist ENDIF';' {$$=create_tree(0,0,NULL,if_node,$3,$8,$6);}
+        | IF '('E')' THEN Slist ENDIF';' {$$=create_tree(0,0,NULL,if_node,$3,NULL,$6);}
 		;
 
-Whilestmt : WHILE '('E')' DO Slist ENDWHILE
+Whilestmt : WHILE '('E')' DO Slist ENDWHILE';' {$$= create_tree(0,0,NULL,while_node,$3,$6,NULL);}
 		;
-E : EL RELOP EL;
-EL : ID|NUM;
-RELOP : GT | LT |GE |LE|NE|EQ;  
+E : expr GT expr	{$$=create_tree(0,booltype,"<",relop_node,$1,$3,NULL);}
+	|expr LT expr {$$ =create_tree(0,booltype,">",relop_node,$1,$3,NULL);}
+	|expr LE expr {$$ =create_tree(0,booltype,">=",relop_node,$1,$3,NULL);}
+	|expr GE expr {$$ =create_tree(0,booltype,"<=",relop_node,$1,$3,NULL);}
+	|expr EQ expr {$$ =create_tree(0,booltype,"==",relop_node,$1,$3,NULL);}
+	|expr NE expr {$$ =create_tree(0,booltype,"!=",relop_node,$1,$3,NULL);}
+	;
 
-expr	:expr PLUS expr		{$$=create_tree(0,0,"+",op_node,$1,$3);}
-	|expr MINUS expr	{$$=create_tree(0,0,"-",op_node,$1,$3);}
-	|expr MUL expr		{$$=create_tree(0,0,"*",op_node,$1,$3);}
-	|expr DIV expr		{$$=create_tree(0,0,"/",op_node,$1,$3);}
+expr	:expr PLUS expr		{$$=create_tree(0,inttype,"+",op_node,$1,$3,NULL);}
+	|expr MINUS expr	{$$=create_tree(0,inttype,"-",op_node,$1,$3,NULL);}
+	|expr MUL expr		{$$=create_tree(0,inttype,"*",op_node,$1,$3,NULL);}
+	|expr DIV expr		{$$=create_tree(0,inttype,"/",op_node,$1,$3,NULL);}
 	|'('expr')'		{$$=$2;}
 	|NUM			{$$=$1;}
 	|ID			{$$=$1;}

@@ -1,6 +1,8 @@
+int var[26];
 
-struct tnode* create_tree(int val,int type,char* varname,int nodetype,struct tnode *l,struct tnode *r)
+struct tnode* create_tree(int val,int type,char* varname,int nodetype,struct tnode *l,struct tnode *r,struct tnode *m)
 {
+	printf("%d",nodetype);
 	struct tnode *temp;
 	temp=(struct tnode*)malloc(sizeof(struct tnode));
 	temp->val=val;
@@ -17,6 +19,23 @@ struct tnode* create_tree(int val,int type,char* varname,int nodetype,struct tno
 	temp->nodetype=nodetype;
 	temp->left=l;
 	temp->right=r;
+    temp->mid =m;
+    if((nodetype==if_node||nodetype==while_node) &&l->type!=booltype)
+    {
+        printf("expected a booltype expresion after if/while statement");
+    }
+    else if((nodetype==read_node||nodetype==write_node) && l->type !=inttype)
+    {
+        printf("expected a inttype after read/write statement");
+    }
+    else if(nodetype==assg_node && r->type!=inttype)
+    {
+        printf("expected inttype after assignment operator");
+    }
+    else if((nodetype==relop_node||nodetype==op_node)&&(l->type!=inttype ||r->type!=inttype))
+    {
+        printf("type mismatch");
+    }
 	return temp;
 }
 void print_node(struct tnode *t)
@@ -26,234 +45,178 @@ void print_node(struct tnode *t)
 	{
   	case 1:
     	printf("op_node ");
-    	break;
-    	case 2:
+    break;
+    case 2:
     	printf("assg_node ");
    	break;
-    	case 3:
+    case 3:
     	printf("conn_node ");
     	break;
-    	case 4:
+    case 4:
     	printf("const_node ");
    	break;
-    	case 5:
-  	printf("read_node ");
+    case 5:
+  	    printf("read_node ");
   	break;
-    	case 6:
+    case 6:
     	printf("var_node ");
    	break;
-    	case 7:
+    case 7:
     	printf("write_node ");
-    	break; 
+    break; 
+	case 8:
+		printf("if_node");
+		break;
+	case 9:
+		printf("while_node");
+		break;
+	case 10:
+		printf("relop_node");
+		break;
 	}
     printf("type:%d val:%d ",t->type,t->val);
 	if(t->varname!=NULL)
 	printf("varname:%c ",*t->varname);
 	printf("\n");
 }
-
-void inorder(struct tnode *t)
+void preorder(struct tnode *t)
 {
 	if(t==NULL)
 	return;
-	inorder(t->left);
+	
+	preorder(t->left);
 	print_node(t);
-	inorder(t->right);
-
+	preorder(t->mid);
+	preorder(t->right);
 }
 
-
-int q=-1;
-int getreg()
+int evaluate(struct tnode *t)
 {
-    ++q;
-    if(q>20)
-        printf("registers exhausted\n");
-    else
-        return q;
-}
-
-void freereg()
-{
-    --q;
-}
-void headergen()
-{
-    FILE *fp =fopen("task2.xsm","a");
-    fprintf(fp, "%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n",0,2056,0,0,0,0,0,0);
-    fprintf(fp, "MOV SP,4121\n");
-    fclose(fp);
-}  
-
-
-int sys_call(char *scall,int arg1, int arg2)
-{
-    FILE *fp=fopen("task2.xsm","a");
- 	int r,i,j;
-  
-    if(strcmp("Write",scall)==0)
-    {
-        i=getreg();
-        fprintf(fp,"MOV R%d,\"%s\"\n",i,scall);
-        fprintf(fp,"PUSH R%d\n",i);
-        fprintf(fp,"MOV R%d,%d\n",i,arg1);
-        fprintf(fp,"PUSH R%d\n",i);
-        fprintf(fp,"PUSH R%d\n",arg2);
-        j=getreg();
-        fprintf(fp,"PUSH R%d\n",j);
-        fprintf(fp,"PUSH R%d\n",j);
-        fprintf(fp,"CALL 0\n");
-        freereg();
-        fprintf(fp,"POP R%d\n",i);
-
-        j=getreg();
-        fprintf(fp,"POP R%d\n",j);
-        fprintf(fp,"POP R%d\n",j);
-        fprintf(fp,"POP R%d\n",j);
-        fprintf(fp,"POP R%d\n",j);
-        freereg();
-        
-        freereg();
-        fclose(fp);
-        return i;
-    }
-   else if(strcmp("Read",scall)==0)
-   {
-     	i=getreg();
-     	fprintf(fp,"MOV R%d,\"%s\"\n",i,scall);
-     	fprintf(fp,"PUSH R%d\n",i);
-
-     	fprintf(fp,"MOV R%d,%d\n",i,arg1);
-     	fprintf(fp,"PUSH R%d\n",i);
-
-     	fprintf(fp,"MOV R%d,%d\n",i,arg2);
-     	fprintf(fp,"PUSH R%d\n",i);
-	
-	    j=getreg();
-     	fprintf(fp,"PUSH R%d\n",j);
-     	fprintf(fp,"PUSH R%d\n",j);
-     	fprintf(fp,"CALL 0\n");
-	    freereg();
-	
-     	fprintf(fp,"POP R%d\n",i);
-
-	    j=getreg();
-     	fprintf(fp,"POP R%d\n",j);
-     	fprintf(fp,"POP R%d\n",j);
-     	fprintf(fp,"POP R%d\n",j);
-     	fprintf(fp,"POP R%d\n",j);
-     	freereg();
-
-     	freereg();
-     	fclose(fp);
-	return i;
-    }
-   else if(strcmp("Exit",scall)==0)
-   {
-     	i=getreg();
-     	fprintf(fp,"MOV R%d,\"%s\"\n",i,scall);
-	    fprintf(fp,"PUSH R%d\n",i);
-     	j=getreg();
-     	fprintf(fp,"PUSH R%d\n",j);
-     	fprintf(fp,"PUSH R%d\n",j);
-     	fprintf(fp,"PUSH R%d\n",j);
-     	fprintf(fp,"PUSH R%d\n",j);
-     	fprintf(fp,"CALL 0\n");
-     	freereg();
-
-     	return i;
-    }
-
-}
-
-
-int codegen(struct tnode* t)
-{
-    FILE *fp;
-    fp=fopen("task2.xsm","a");
-    int temp,i;
-    int l, r;
-
-    switch(t->nodetype)
+    if(t==NULL)
+    return 0;
+	int v,l,r,inp,temp;	
+    int bool_ret;
+	switch(t->nodetype)
 	{
+		case read_node:
+			v=*(t->left->varname)-'a';
+			inp=scanf("%d",&var[v]);
+			return inp;
+		break;
+
+		case write_node:
+			r=evaluate(t->left);
+			printf("%d\n",r);
+			return r;
+		break;
 
 		case conn_node:
-            temp= codegen(t->left);
-            temp= codegen(t->right);
-            //returned val doesnt matter cuz each stmt is independent and commited to memory 
-            fclose(fp);
-			return temp;
-            break;
-        case read_node:
-            temp =4096+*(t->left->varname)-'a';
-            temp =sys_call("Read",-1,temp);
-            fclose(fp);
-			return temp;
-            break;
-        case write_node:
-            temp =codegen(t->left);
-            temp =sys_call("Write",-2,temp);
-            freereg();
-            fclose(fp);
-			return temp;
-            break;
 
-        case const_node:
-            temp=getreg();
-			fprintf(fp,"MOV R%d,%d\n",temp,t->val);
-			fclose(fp);
-			return temp;
-            break;
-        case var_node:
-            temp=4096 + *(t->varname)-'a';
-			i=getreg();
-			fprintf(fp,"MOV R%d,[%d]\n",i,temp);
-			fclose(fp);
-			return i;
-            break;
+			l=evaluate(t->left);
+			r=evaluate(t->right);
+			return l;
+		break;
+		
+		case var_node:
+			v=*(t->varname)-'a';
+			return var[v];
+		break;
 
-        case assg_node:
-            i=codegen(t->right);
-			temp=4096+*(t->left->varname)-'a';
-			fprintf(fp,"MOV [%d],R%d\n",temp,i);
-			fclose(fp);
-			freereg();
-			return i;
-            break;
-        case op_node:
-            
-            l = codegen(t->left);
-            r = codegen(t->right);
-            switch (*(t->varname))
+		case const_node:
+			return t->val;
+		break;
+
+		case assg_node:
+			r=evaluate(t->right);
+			v=*(t->left->varname)-'a';
+			var[v]=r;
+			return var[v];
+		break;
+
+		case op_node:
+			l=evaluate(t->left);
+			r=evaluate(t->right);
+			switch(*(t->varname))
+			{
+				case '+':
+					return l+r;
+					break;
+				case '-':
+					return l-r;
+					break;
+				case '*':
+					return l*r;
+					break;
+				case '/':
+					return l/r;
+					break;
+			}
+        case relop_node:
+            l=evaluate(t->left);
+			r=evaluate(t->right);
+            if(strcmp(t->varname,">=")==0)
+				{ 
+					if(l>=r)
+						return 1;
+					else
+						return 0;
+				}
+				else if(strcmp(t->varname,"<=")==0)
+				{ 
+					if(l<=r)
+						return 1;
+					else
+						return 0;
+				}
+				else if(strcmp(t->varname,">")==0)
+				{
+					if(l>r)
+						return 1;
+					else
+						return 0;
+				}
+				else if(strcmp(t->varname,"<")==0)
+				{ 
+					if(l<r)
+						return 1;
+					else
+						return 0;
+				}
+				else if(strcmp(t->varname,"==")==0)
+				{ 
+					if(l==r)
+						return 1;
+					else
+						return 0;
+				}
+				else if(strcmp(t->varname,"!=")==0)
+				{ 
+					if(l!=r)
+						return 1;
+					else
+						return 0;
+				}
+                break;
+        case if_node:
+            l=evaluate(t->left);
+            if(l==1)
             {
-                case '+':
-                {
-                    fprintf(fp, "ADD R%d,R%d\n", l, r);
-                    break;
-                }
-
-                case '-':
-                {
-                    fprintf(fp, "SUB R%d,R%d\n", l, r);
-                    break;
-                }
-                case '*':
-                {
-                    fprintf(fp, "MUL R%d,R%d\n", l, r);
-                    break;
-                }
-                case '/':
-                {
-                    fprintf(fp, "DIV R%d,R%d\n", l, r);
-                    break;
-                }
+                temp =evaluate(t->mid);
             }
-            freereg();
-            fclose(fp);
-            return l;
+            else
+            {
+                temp =evaluate(t->right);
+            }
+			//printf("if done");
+            return 1;
             break;
-        
-        
 
-    } 
+        case while_node:
+            while(evaluate(t->left)==1)
+            {
+                r=evaluate(t->right);
+            }
+            return 1;
+		break;
+	}
 }
