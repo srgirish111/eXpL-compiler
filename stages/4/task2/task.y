@@ -21,9 +21,10 @@
 	char *name;
 }
 
-%token NUM VAR PLUS MINUS MUL DIV READ WRITE IF THEN ELSE ENDIF WHILE DO ENDWHILE GT LT GE LE EQ NE PBEGIN PEND CONTINUE BREAK INT STR DECL ENDDECL MESG
-%type <no> NUM VAR MESG expr Whilestmt Ifstmt Stmt Slist program 
-
+%token NUM PLUS MINUS MUL DIV READ WRITE IF THEN ELSE ENDIF WHILE DO ENDWHILE GT LT GE LE EQ NE PBEGIN PEND CONTINUE BREAK INT STR DECL ENDDECL MESG ID
+%type <no> expr Whilestmt Ifstmt Stmt Slist program IDEN
+%type <numb> NUM
+%type <name> ID MESG
 %left GE LE EQ NE GT LT
 %left PLUS MINUS
 %left MUL DIV
@@ -60,20 +61,20 @@ Type	:INT					{currtype=inttype;}
 							//print_symbol_table();
 							}
 	;
-Varlist :Varlist ',' VAR	{
+Varlist :Varlist ',' ID	{
 							//printf("currtype:%d\n",currtype);
-						 	Install($3->varname,currtype,1);
+						 	Install($3,currtype,1);
 							}	
-	|VAR					{
+	|ID					{
 							//printf("currtype:%d\n",currtype);
-						  	Install($1->varname,currtype,1);
+						  	Install($1,currtype,1);
 							}
-	|Varlist ',' VAR'['NUM']' 
+	|Varlist ',' ID'['NUM']' 
 							{
-							Install($3->varname,currtype,$5->val);
+							Install($3,currtype,$5);
 							}
-	| VAR'['NUM']'			{
-							Install($1->varname,currtype,$3->val);
+	| ID'['NUM']'			{
+							Install($1,currtype,$3);
 							}
 
 	;
@@ -81,9 +82,9 @@ Varlist :Varlist ',' VAR	{
 Slist	: Slist Stmt		{$$=create_tree(0,0,NULL,conn_node,$1,$2,NULL);}	
 	|Stmt			{$$=$1;}
 	;
-Stmt	: READ'('VAR')'';'	{$$=create_tree(0,0,NULL,read_node,$3,NULL,NULL);}
+Stmt	: READ'('IDEN')'';'	{$$=create_tree(0,0,NULL,read_node,$3,NULL,NULL);}
 	|WRITE'('expr')'';'	{$$=create_tree(0,0,NULL,write_node,$3,NULL,NULL);}
-	|VAR'='expr';'	{$$=create_tree(0,0,"=",assg_node,$1,$3,NULL);}
+	|IDEN'='expr';'	{$$=create_tree(0,0,"=",assg_node,$1,$3,NULL);}
 	|Ifstmt
 	|Whilestmt
 	|BREAK';' {$$=create_tree(0,0,NULL,break_node,NULL,NULL,NULL);}
@@ -107,11 +108,14 @@ expr	:expr PLUS expr		{$$=create_tree(0,inttype,"+",op_node,$1,$3,NULL);}
 	|expr EQ expr {$$ =create_tree(0,booltype,"==",relop_node,$1,$3,NULL);}
 	|expr NE expr {$$ =create_tree(0,booltype,"!=",relop_node,$1,$3,NULL);}
 	|'('expr')'		{$$=$2;}
-	|VAR			{$$=create_tree(0,notype,$1,var_node,NULL,NULL,NULL);}
-	|NUM			{$$=create_tree(number,inttype,NULL,iconst_node,NULL,NULL,NULL);}
-	|MESG			{$$=create_tree(0,strtype,$1,sconst_node,NULL,NULL,NULL);;}
-	|VAR'['NUM']'	{$$=create_tree(0,notype,$1,var_node,NULL,NULL,NULL);}
+	|IDEN			{$$=$1;}
+	|NUM			{$$=create_tree($1,inttype,NULL,iconst_node,NULL,NULL,NULL);}
+	|MESG			{$$=create_tree(0,strtype,$1,sconst_node,NULL,NULL,NULL);}
 	;
+IDEN : ID {$$=create_tree(0,notype,$1,var_node,NULL,NULL,NULL);}
+		|
+		ID '['expr']' {$$=create_tree(0,notype,$1,var_node,$3,NULL,NULL);}
+		;
 %%
 int yyerror(char const *s)
 {

@@ -55,35 +55,35 @@ extern int yydebug;
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
     NUM = 258,                     /* NUM  */
-    VAR = 259,                     /* VAR  */
-    PLUS = 260,                    /* PLUS  */
-    MINUS = 261,                   /* MINUS  */
-    MUL = 262,                     /* MUL  */
-    DIV = 263,                     /* DIV  */
-    READ = 264,                    /* READ  */
-    WRITE = 265,                   /* WRITE  */
-    IF = 266,                      /* IF  */
-    THEN = 267,                    /* THEN  */
-    ELSE = 268,                    /* ELSE  */
-    ENDIF = 269,                   /* ENDIF  */
-    WHILE = 270,                   /* WHILE  */
-    DO = 271,                      /* DO  */
-    ENDWHILE = 272,                /* ENDWHILE  */
-    GT = 273,                      /* GT  */
-    LT = 274,                      /* LT  */
-    GE = 275,                      /* GE  */
-    LE = 276,                      /* LE  */
-    EQ = 277,                      /* EQ  */
-    NE = 278,                      /* NE  */
-    PBEGIN = 279,                  /* PBEGIN  */
-    PEND = 280,                    /* PEND  */
-    CONTINUE = 281,                /* CONTINUE  */
-    BREAK = 282,                   /* BREAK  */
-    INT = 283,                     /* INT  */
-    STR = 284,                     /* STR  */
-    DECL = 285,                    /* DECL  */
-    ENDDECL = 286,                 /* ENDDECL  */
-    MESG = 287                     /* MESG  */
+    PLUS = 259,                    /* PLUS  */
+    MINUS = 260,                   /* MINUS  */
+    MUL = 261,                     /* MUL  */
+    DIV = 262,                     /* DIV  */
+    READ = 263,                    /* READ  */
+    WRITE = 264,                   /* WRITE  */
+    IF = 265,                      /* IF  */
+    THEN = 266,                    /* THEN  */
+    ELSE = 267,                    /* ELSE  */
+    ENDIF = 268,                   /* ENDIF  */
+    WHILE = 269,                   /* WHILE  */
+    DO = 270,                      /* DO  */
+    ENDWHILE = 271,                /* ENDWHILE  */
+    GT = 272,                      /* GT  */
+    LT = 273,                      /* LT  */
+    GE = 274,                      /* GE  */
+    LE = 275,                      /* LE  */
+    EQ = 276,                      /* EQ  */
+    NE = 277,                      /* NE  */
+    PBEGIN = 278,                  /* PBEGIN  */
+    PEND = 279,                    /* PEND  */
+    CONTINUE = 280,                /* CONTINUE  */
+    BREAK = 281,                   /* BREAK  */
+    INT = 282,                     /* INT  */
+    STR = 283,                     /* STR  */
+    DECL = 284,                    /* DECL  */
+    ENDDECL = 285,                 /* ENDDECL  */
+    MESG = 286,                    /* MESG  */
+    ID = 287                       /* ID  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -93,35 +93,35 @@ extern int yydebug;
 #define YYerror 256
 #define YYUNDEF 257
 #define NUM 258
-#define VAR 259
-#define PLUS 260
-#define MINUS 261
-#define MUL 262
-#define DIV 263
-#define READ 264
-#define WRITE 265
-#define IF 266
-#define THEN 267
-#define ELSE 268
-#define ENDIF 269
-#define WHILE 270
-#define DO 271
-#define ENDWHILE 272
-#define GT 273
-#define LT 274
-#define GE 275
-#define LE 276
-#define EQ 277
-#define NE 278
-#define PBEGIN 279
-#define PEND 280
-#define CONTINUE 281
-#define BREAK 282
-#define INT 283
-#define STR 284
-#define DECL 285
-#define ENDDECL 286
-#define MESG 287
+#define PLUS 259
+#define MINUS 260
+#define MUL 261
+#define DIV 262
+#define READ 263
+#define WRITE 264
+#define IF 265
+#define THEN 266
+#define ELSE 267
+#define ENDIF 268
+#define WHILE 269
+#define DO 270
+#define ENDWHILE 271
+#define GT 272
+#define LT 273
+#define GE 274
+#define LE 275
+#define EQ 276
+#define NE 277
+#define PBEGIN 278
+#define PEND 279
+#define CONTINUE 280
+#define BREAK 281
+#define INT 282
+#define STR 283
+#define DECL 284
+#define ENDDECL 285
+#define MESG 286
+#define ID 287
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -130,8 +130,10 @@ union YYSTYPE
 #line 18 "task.y"
 
 	struct tnode *no;
+	int numb;
+	char *name;
 
-#line 135 "y.tab.h"
+#line 137 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

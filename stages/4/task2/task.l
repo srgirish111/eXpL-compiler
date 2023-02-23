@@ -60,6 +60,7 @@
 "*"		  	{return MUL;}
 "/"		  	{return DIV;}
 [()]	  	{return *yytext;}
+
 "<" 	  	{return GT;}
 ">"   	  	{return LT;}
 "<=" 	  	{return GE;}
@@ -81,6 +82,24 @@
 "enddecl" 	{declflag=0;return ENDDECL;}
 "int" 		{return INT;}
 "str"		{return STR;}
+[\[\]]		{
+				if(wrap_no==0)
+				{
+					return *yytext;
+				}
+				else if(wrap_no==1)
+				{
+					f=fopen("task_int.xsm","a");
+					fprintf(f,"%s",yytext);
+					fclose(f);
+				}
+				else if(wrap_no==2)
+				{
+					f=fopen("task_fin.xsm","a");
+					fprintf(f,"%s",yytext);
+					fclose(f);
+				}
+			}
 ","			{if(wrap_no==0)
 				{
 					return *yytext;}
@@ -181,7 +200,7 @@ L[0-9]+:\n {
 		if(wrap_no==0)
 		{
 			yylval.name=strdup(yytext);
-			return VAR;
+			return ID;
 		}
 		else if(wrap_no==1)
 		{

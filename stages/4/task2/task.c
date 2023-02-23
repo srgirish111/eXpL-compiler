@@ -82,17 +82,14 @@ void typecheck(struct tnode *t)
         }
         break;
     case var_node:
-		if(declflag==0)
+		temp=Lookup(t->varname);
+		if(temp==NULL)
 		{
-			temp=Lookup(t->varname);
-			if(temp==NULL)
-			{
-		     	printf("Variable:%s Undeclared\n",t->varname);
-				exit(1);
-			}
-			t->type=temp->type;
-			t->Gentry=temp;
+			printf("Variable:%s Undeclared\n",t->varname);
+			exit(1);
 		}
+		t->type=temp->type;
+        t->Gentry=temp;
 		break;
     }
 }
@@ -226,8 +223,7 @@ int sys_call(char *scall,int arg1, int arg2)
      	fprintf(fp,"MOV R%d,%d\n",i,arg1);
      	fprintf(fp,"PUSH R%d\n",i);
 
-     	fprintf(fp,"MOV R%d,%d\n",i,arg2);
-     	fprintf(fp,"PUSH R%d\n",i);
+     	fprintf(fp,"PUSH R%d\n",arg2);
 	
 	    j=getreg();
      	fprintf(fp,"PUSH R%d\n",j);
@@ -284,10 +280,35 @@ int codegen(struct tnode* t)
 			return temp;
             break;
         case read_node:
-            temp=t->left->Gentry->binding;
-            temp =sys_call("Read",-1,temp);
-            fclose(fp);
-			return temp;
+            
+            //temp =sys_call("Read",-1,temp);
+
+            if(t->left->left==NULL)
+            {
+                temp=t->left->Gentry->binding;
+                i=getreg();
+			    fprintf(fp,"MOV R%d,%d\n",i,temp);
+                fclose(fp);
+                temp=sys_call("Read",-1,i);
+                freereg();
+                
+			    return i;
+            }
+            else
+            {
+                l = codegen(t->left->left);
+                i=getreg();
+                temp=t->left->Gentry->binding;
+                fprintf(fp,"MOV R%d,%d\n",i,temp);
+                fprintf(fp,"ADD R%d,R%d\n",i,l);
+                fprintf(fp,"MOV R%d,R%d\n",l,i);
+                freereg();
+                fclose(fp);
+                temp=sys_call("Read",-1,l);
+                freereg();
+                
+                return l;
+            }
             break;
         case write_node:
             temp =codegen(t->left);
@@ -311,20 +332,60 @@ int codegen(struct tnode* t)
 			return temp;
             break;
         case var_node:
-            temp=t->Gentry->binding;
-			i=getreg();
-			fprintf(fp,"MOV R%d,[%d]\n",i,temp);
-			fclose(fp);
-			return i;
+            if(t->left==NULL)
+            {
+                temp=t->Gentry->binding;
+                i=getreg();
+			    fprintf(fp,"MOV R%d,[%d]\n",i,temp);
+                fclose(fp);
+			    return i;
+            }
+            else
+            {
+                l = codegen(t->left);
+                i=getreg();
+                temp=t->Gentry->binding;
+                fprintf(fp,"MOV R%d,%d\n",i,temp);
+                fprintf(fp,"ADD R%d,R%d\n",i,l);
+                fprintf(fp,"MOV R%d,[R%d]\n",l,i);
+                freereg();
+                fclose(fp);
+                return l;
+            }
+
             break;
 
         case assg_node:
-            i=codegen(t->right);
-			temp=t->left->Gentry->binding;
-			fprintf(fp,"MOV [%d],R%d\n",temp,i);
+            //l=codegen(t->left);
+            //somechanges need to be made here
+            if(t->left->left==NULL)
+            {
+                temp=t->left->Gentry->binding;
+                l=getreg();
+			    fprintf(fp,"MOV R%d,%d\n",l,temp);
+                fclose(fp);
+			    //return i;
+            }
+            else
+            {
+                l = codegen(t->left->left);
+                i=getreg();
+                temp=t->left->Gentry->binding;
+                fprintf(fp,"MOV R%d,%d\n",i,temp);
+                fprintf(fp,"ADD R%d,R%d\n",i,l);
+                fprintf(fp,"MOV R%d,R%d\n",l,i);
+                freereg();
+                fclose(fp);
+                //return l;
+            }
+            r=codegen(t->right);
+			//temp=t->left->Gentry->binding;
+            fp=fopen("task.xsm","a");
+			fprintf(fp,"MOV [R%d],R%d\n",l,r);
 			fclose(fp);
 			freereg();
-			return i;
+            freereg();
+			return l;
             break;
         case op_node:
             
@@ -552,3 +613,7 @@ void Install(char *name, int type, int size)
     sym_tab_tail->next=temp;
     sym_tab_tail=temp;
 }
+
+
+/*error possible 
+check for freereg */
