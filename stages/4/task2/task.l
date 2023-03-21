@@ -13,6 +13,24 @@
 	int declflag=0;
 %}
 
+%{
+#ifdef DEBUG
+    int dbgToken(int tok, char *s) {
+        printf("token %s\n", s);
+        return tok;
+    }
+    int dbgTokenIvalue(int tok, char *s) {
+        printf("token %s (%d)\n", s, yylval.ivalue);
+        return tok;
+    }
+    #define RETURN(x) return dbgToken(x, #x)
+    #define RETURN_ivalue(x) return dbgTokenIvalue(x, #x)
+#else
+    #define RETURN(x) return(x)
+    #define RETURN_ivalue(x) return(x)
+#endif
+%}
+
 /*struct tnode* create_tree(int val,int type,char* varname,int nodetype,struct tnode *l,struct tnode *r);*/
 %%
 [0-9]+		{	

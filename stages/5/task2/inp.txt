@@ -1,0 +1,28 @@
+decl
+    int result,factorial(int n);
+enddecl
+
+int factorial(int n,int z){
+    decl
+        int f;
+    enddecl
+    begin
+        if( n==1 OR n==0 ) then
+            f = 1;
+        else
+            f = n * factorial(n-1,0);
+        endif;
+        return f;
+    end
+}
+int main(){
+    decl
+        int a;
+    enddecl
+    begin
+        read(a);
+        result = factorial(a);
+        write(result);
+        return 1;
+    end
+}

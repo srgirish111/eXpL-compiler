@@ -17,7 +17,7 @@
 #define inttype 1
 #define strtype 2
 
-
+//print t->nodetype
 typedef struct tnode{
     int val;                    // value of the constant
     char* varname;              // name of the variable

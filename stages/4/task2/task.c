@@ -1,6 +1,7 @@
 int stack[50];
 int top=-1;
 int binding_add =4096;
+//break task.y:
 struct Gsymbol *sym_tab_head,*sym_tab_tail;
 struct tnode* create_tree(int val,int type,char* varname,int nodetype,struct tnode *l,struct tnode *r,struct tnode *m)
 {
@@ -40,7 +41,7 @@ void typecheck(struct tnode *t)
         break;
 
     case assg_node:
-        if(t->left->nodetype!=var_node )
+        if(t->left->nodetype!=var_node ||(t->left->type!=t->right->type))
         {
             printf("expected a variable near assignment(=)");
             exit(1);
@@ -82,14 +83,24 @@ void typecheck(struct tnode *t)
         }
         break;
     case var_node:
-		temp=Lookup(t->varname);
-		if(temp==NULL)
-		{
-			printf("Variable:%s Undeclared\n",t->varname);
-			exit(1);
-		}
-		t->type=temp->type;
-        t->Gentry=temp;
+        
+            temp=Lookup(t->varname);
+            if(temp==NULL)
+            {
+                printf("Variable:%s Undeclared\n",t->varname);
+                exit(1);
+            }
+            t->type=temp->type;
+            t->Gentry=temp;
+        
+        if(t->left!=NULL)
+        {
+            if(t->left->type!=inttype)
+            {
+                printf("expected inttypein array\n");
+                exit(1);
+            }
+        }
 		break;
     }
 }
@@ -147,8 +158,9 @@ void inorder(struct tnode *t)
 {
 	if(t==NULL)
 	return;
-	print_node(t);
+	
 	inorder(t->left);
+    print_node(t);
 	inorder(t->mid);
 	inorder(t->right);
 }
