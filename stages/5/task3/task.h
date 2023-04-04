@@ -73,7 +73,6 @@ extern int ins_cnt,wrap_no;
 extern int lcl_bind;
 extern int line_no;
 extern struct lbl *head,*tail;
-
 void insertlabel(char *name);
 int searchlabel(char *name);
 void print_lbl_tbl();

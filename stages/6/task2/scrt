@@ -1,0 +1,5 @@
+lex task.l
+yacc -d task.y
+gcc lex.yy.c y.tab.c -o out.exe
+gcc -g lex.yy.c y.tab.c
+./out.exe

@@ -139,7 +139,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 18 "task.y"
+#line 19 "task.y"
 
 	struct tnode *no;
 	struct param *par;

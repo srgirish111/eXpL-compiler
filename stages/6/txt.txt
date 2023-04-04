@@ -1,0 +1,38 @@
+Similarly, memory allocated to a user defined variable may be freed by a call to the library function Free().
+The library function Initialize() initializes the memory allocator of the library.
+
+
+The library has three functions relating to dynamic memory management. 
+Initialise(), Allocate() and Free(). The Initialise() function sets up the heap data structures initially. 
+Each memory request is processed by Alloc() and Free() de-allocates a previously allocated memory block.
+
+
+
+
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\----------------------------////////////////////////////////////////////////
+------------------------------------------->>>>>>>>task1<<<<<<<<<<<<<<<<--------------------------------------------
+--->implement type table
+--->Symbol table must also be modified to handle user-defined-types information. 
+    The type field of the symbol table entry of a variable/function shall refer to the type table entry of the corresponding type
+--->Field :: = Field '.' ID { $$.type = $3. type; }
+        | ID '.' ID { $$.type = $3.type; }
+    While constructing the AST, the type entry for any field may be recursively computed using the formal rule noted above. 
+    This information can be used for effective semantic analysis. 
+    Arguments to functions must also be type checked against formal parameters of their declaration.
+--->ExpL specification demands a rigid type analysis by name equivalence. 
+    This differs from the more liberal structural equivalance in the C programming language.
+
+
+A variable of a user-defined-type must be allocated at compile time one memory word to store an address (basically an integer) returned by Alloc() at run time.
+ The allocation could be static or run-time. ExpL specification does not permit arrays of user-defined type.
+
+
+
+strgy
+->Organize the heap into a linear linked list of blocks of size 8.
+    We will design a heap initializer function Initialize() specifically for this.
+
+The compiler must flag an error "too many member fields" if a user-defined type definition has more than 8 member fields.
+
+Your library functions will need to modify registers and hence before a library call,
+ ensure that registers in current use are saved in the stack (as was done with function calls in the previous stage).

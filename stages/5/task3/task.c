@@ -6,6 +6,7 @@ int lcl_bind =1,lcl_length=0;
 
 
 
+struct Gsymbol *func_entry=NULL;
 struct Gsymbol *sym_tab_head=NULL, *sym_tab_tail=NULL;
 struct Lsymbol *lcl_head =NULL,*lcl_tail=NULL;
 struct tnode* create_tree(int val,int type,char* varname,int nodetype,struct tnode *l,struct tnode *r,struct tnode *m)
@@ -144,6 +145,24 @@ void typecheck(struct tnode *t)
         t->type=temp->type;
         t->Gentry=temp;
         break;
+    case ret_node:
+        if(func_entry==NULL) //main
+        {
+            if(t->left->type!=inttype)
+            {
+                printf("error in return value for main\n");
+                exit(1);
+            }
+        }
+        else
+        {
+            if(t->left->type!=func_entry->type)
+            {
+                printf("%s--->>return value doesnt match function return value\n",func_entry->name);
+                exit(1);
+            }
+            func_entry=NULL;
+        }
     }
 }
 
@@ -173,9 +192,7 @@ void argcheck(struct tnode *t,struct Gsymbol *func)
         //print_node(temp1);
         //inorder(t);
         exit(1);
-    }
-
-    
+    }   
 }
 
 
@@ -456,8 +473,12 @@ void GInstall(char *name, int type, int size,struct param *p)
     strcpy(temp->name, name);
     temp->type = type;
     temp->size = size;
+    if(size>0)
+    {
+    
     temp->binding = binding_add;
     binding_add += size;
+    }
     temp->paramlist = p;
     if(p!=NULL)
     temp->flabel= f_no++;
@@ -508,6 +529,7 @@ void check_name_equi(int type,char *name,struct param *p)
         }
         temp = temp->next;
     }
+    func_entry=temp;
     if(temp==NULL)
     {
         printf("%s :function declaration not found",name);

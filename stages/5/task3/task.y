@@ -12,6 +12,7 @@
 	FILE *fp=NULL;
 	extern FILE *yyin;
 	int currtype;
+
 %}
 
 %union
@@ -25,7 +26,7 @@
 %token NUM PLUS MINUS MUL DIV READ WRITE IF THEN ELSE ENDIF WHILE DO ENDWHILE GT LT GE LE EQ NE PBEGIN PEND CONTINUE BREAK INT STR DECL ENDDECL MESG ID
 %token RETURN MAINFN ANDTKN ORTKN NOTTKN
 %type <no> expr Whilestmt Ifstmt Stmt Slist IDEN Fdef Body Rstmt MainBlock ArgList
-%type <numb> NUM Type
+%type <numb> NUM Type Ptype
 %type <name> ID MESG Ftype_param
 %type <par> ParamList Param
 %left GE LE EQ NE GT LT ANDTKN ORTKN NOTTKN
@@ -114,7 +115,11 @@ ParamList : ParamList ',' Param {PInstall($1,$3);
 		| Param {$$ =$1;}
         |  /*epsilon*/{$$=NULL;}
         ;
-Param : Type ID {$$ = create_par($2,$1);
+Ptype :INT		{$$=inttype; }
+	|STR			{$$=strtype; }
+	;
+Param : Ptype ID {$$ = create_par($2,$1);
+
 printf("param\n");} ;
 
 
@@ -142,7 +147,7 @@ Type	:INT					{currtype=inttype;
 							//print_symbol_table();
 							}
 
-
+	;
 //Since a function call is treated as an expression (whose value is the return value of the function), the following rules must be added:
 ///////////////////////////////
 ///////////////////////////////
