@@ -1,0 +1,8 @@
+/////////////////////////////////////////////////
+The statements inside an if-block may be conditional, iterative, assignment, input/output, break or continue statements, but not the return statement.
+
+The statements inside a while-block may be conditional, iterative, assignment, input/output, break or continue statements, but not the return statement.
+
+The body of each function (including main) should have exactly one return statement and it should be the last statement in the body.
+
+///////////////////////////////////////////////////////

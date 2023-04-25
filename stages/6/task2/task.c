@@ -102,7 +102,7 @@ void typecheck(struct tnode *t)
         }
         break;
     case relop_node:
-        inorder(t);
+        //inorder(t);
         if((strcmp(t->left->type->name,"int")!=0|| strcmp(t->right->type->name,"int")!=0) && !(is_struct(t->left->type->name) && t->right->nodetype==null_node) )
             {
                 printf("expected matching type exprs on both sides of RELOP -- %d\n",ins_cnt);

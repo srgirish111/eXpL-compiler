@@ -1,0 +1,63 @@
+
+
+
+
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\----------------------------////////////////////////////////////////////////
+------------------------------------------->>>>>>>>task1<<<<<<<<<<<<<<<<--------------------------------------------
+--->implement type table
+--->Symbol table must also be modified to handle user-defined-types information. 
+    The type field of the symbol table entry of a variable/function shall refer to the type table entry of the corresponding type
+--->Field :: = Field '.' ID { $$.type = $3. type; }
+        | ID '.' ID { $$.type = $3.type; }
+    While constructing the AST, the type entry for any field may be recursively computed using the formal rule noted above. 
+    This information can be used for effective semantic analysis. 
+    Arguments to functions must also be type checked against formal parameters of their declaration.
+--->ExpL specification demands a rigid type analysis by name equivalence. 
+    This differs from the more liberal structural equivalance in the C programming language.
+
+
+A variable of a user-defined-type must be allocated at compile time one memory word to store an address (basically an integer) returned by Alloc() at run time.
+ The allocation could be static or run-time. ExpL specification does not permit arrays of user-defined type.
+
+
+
+strgy
+->Organize the heap into a linear linked list of blocks of size 8.
+    We will design a heap initializer function Initialize() specifically for this.
+
+The compiler must flag an error "too many member fields" if a user-defined type definition has more than 8 member fields.
+
+Your library functions will need to modify registers and hence before a library call,
+ ensure that registers in current use are saved in the stack (as was done with function calls in the previous stage).
+
+---------------------
+local declarations of arrays or classes is not allowed
+
+
+
+/////////////////////////////
+///////////////////////////////////
+//////////////////////////////////
+if class B extends class A and class C extends class B, then a variable of class A can refer to objects of classes A, B or C, 
+whereas a variable of class B can refer to any object of class B or C.
+/////////////
+If a variable of a parent class holds the reference to an object of a descendent class, 
+only methods defined in the parent class are allowed to be invoked using the variable of the parent class.
+//////////////////
+//////////////////////////
+////////////////////////////
+The OExpL specification requires that a class can have only a single method of a given name, and the signature of a method 
+inherited from a parent class (over-ridden or otherwise) must be identical with the signature of the method in the parent class.
+///////////////////////////////////////
+////////////////////////////////////////////
+///////////////////////////////////
+
+Methods of a class variable are accessed as self.method_name(..args..). (If a member is of a previously class, 
+self.field_name.method_name(..args..)).
+A member field in a class shall be accessed only within a method of the same class. 
+The access syntax will be self.field_name. (Note: if field_name is variable of another class (or the same class), 
+accessing member fields of the member using syntax self.field_name.sub_field.name is not be permitted – why?)
+A method of one class is generally not permitted to access methods of other classes. 
+However, if a class contains a member field of another class, then the methods accessible 
+through the member field can be invoked as noted in point 1 above.
+There is exactly one method carrying a name in a class. Thus, function overloading is not permitted.
